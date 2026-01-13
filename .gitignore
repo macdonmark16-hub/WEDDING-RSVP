@@ -1,0 +1,5 @@
+node_modules/
+*.log
+.env
+rsvp_data.xlsx
+.DS_Store
