@@ -18,12 +18,12 @@ if (fs.existsSync(excelFile)) {
     workbook = XLSX.readFile(excelFile);
 } else {
     workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([['Name', 'Email', 'contact', 'Guests', 'Attendance', 'Message']]), 'RSVPs');
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([['Name', 'Email', 'contact', 'Guests', 'Attendance', 'guestNames']]), 'RSVPs');
 }
 
 app.post('/rsvp', upload.none(), (req, res) => {
 
-    const { name, email, contact, guests, attendance, Message } = req.body;
+    const { name, email, contact, guests, attendance, guestNames } = req.body;
     if (!name || !email || !contact || !guests || !attendance) {
         return res.status(400).send('Error: All required fields must be filled.');
 }
@@ -31,7 +31,7 @@ app.post('/rsvp', upload.none(), (req, res) => {
     const sheet = workbook.Sheets['RSVPs'];
     const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-    data.push([name, email, contact, guests, attendance, Message]);
+    data.push([name, email, contact, guests, attendance, guestNames || '']);
 
     workbook.Sheets['RSVPs'] = XLSX.utils.aoa_to_sheet(data);
     workbook.Sheets['RSVPs']['!cols']=[
@@ -40,7 +40,7 @@ app.post('/rsvp', upload.none(), (req, res) => {
         { wch: 15 },  // contact
         { wch: 10 },  // guest
         { wch: 12 },  // attendance
-        { wch: 30 }   // message
+        { wch: 30 }   // guest names
     ];
     XLSX.writeFile(workbook, excelFile);
 
